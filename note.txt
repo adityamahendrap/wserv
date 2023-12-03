@@ -1,0 +1,71 @@
+https://build-your-own.org/webserver/
+
+
+ client        server
+ ------        ------
+| req1 |  ==>
+         <==  | res1 |
+| req2 |  ==>
+         <==  | res2 |
+         ...
+
+
+ top
+  /\    | App |     message or whatever
+  ||    | TCP |     byte stream
+  ||    | IP  |     packets
+  ||    | ... |
+bottom
+
+
+tcp => byte
+udp => packet
+
+The server waits for the client at a specific address (IP + port), this step is called bind & listen.
+Then the client can connect to that address. 
+The “connect” operation involves a 3-step handshake (SYN, SYN-ACK, ACK), but this is not our concern because the OS does it transparently. 
+After the OS completes the handshake, the connection can be accepted by the server.
+
+List of Socket Primitives
+    Listening socket:
+        bind & listen
+        accept
+        close
+    Connection socket:
+        read
+        write
+        close
+
+what happens when the producer is producing faster than the consumer is consuming?
+There must be a mechanism to prevent the queue or buffer from overflowing.
+This mechanism is often called backpressure in network applications.
+
+
+                           TCP
+|producer| ==> |send buf| =====> |recv buf| ==> |consumer|
+    app            OS                OS            app
+
+
+           write()                  event loop             TCP
+|producer| ======> |internal queue| =========> |send buf| =====> ...
+    app                Node.js                     OS
+
+
+client      server
+------      ------
+msg1\n  ==>
+       <==  Echo: msg1\n
+msg2\n  ==>
+       <==  Echo: msg2\n
+quit\n  ==>
+       <==  Bye.\n
+
+
+Chunked Encoding:
+| len | data | len | data | ... | len | data | end |
+4\r\nHTTP\r\n5\r\nserver\r\n0\r\n\r\n
+
+It is parsed into 3 chunks:
+    4\r\nHTTP\r\n
+    6\r\nserver\r\n
+    0\r\n\r\n
